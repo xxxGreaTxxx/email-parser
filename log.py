@@ -25,7 +25,7 @@ class Log:
         return self.__handler
 
     def __set_formatter(self):
-        self.__formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+        self.__formatter = logging.Formatter("[%(name)s] [%(asctime)s] [%(levelname)s] %(message)s")
 
     def __get_formatter(self):
         return self.__formatter

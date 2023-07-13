@@ -3,6 +3,7 @@ from folder import Folder
 from message import Message
 import imaplib
 from config import config_vars
+from auth import email_login, email_password
 
 
 class Mail:
@@ -28,8 +29,10 @@ class Mail:
 
     def __set_fields_from_config(self):
         self.__server = config_vars['email_server']
-        self.__login = config_vars['email_login']
-        self.__password = config_vars['email_password']
+        # self.__login = config_vars['email_login']
+        # self.__password = config_vars['email_password']
+        self.__login = email_login
+        self.__password = email_password
         self.__folder_name = config_vars['folder']
         self.__from_field = config_vars['from']
 
@@ -57,8 +60,10 @@ class Mail:
             self.__set_fields_from_config()
             self.__imap.login(self.__get_email_login(), self.__get_email_password())
             self.__log.add(Levels.info, 'Подключение прошло успешно')
+            return True
         except Exception as e:
             self.__log.add(Levels.critical, f'Подключение не удалось из-за ошибки:\n{e}')
+            return False
 
     def __get_all_folders(self):
         self.__log.add(Levels.info, 'Получаем список папок...')
@@ -98,13 +103,16 @@ class Mail:
         self.set_message(message)
         if message.check_from_field(self.__from_field):
             message.get_message_body()
+            message.set_bot_name()
             message.set_name_and_phone()
 
     def get_messages_from_bot(self):
-        self.__connect()
-        self.__get_all_folders()
-        self.__open_folder()
-        self.__get_unread_messages()
+        if self.__connect():
+            self.__get_all_folders()
+            self.__open_folder()
+            self.__get_unread_messages()
+            return True
+        return False
 
     def set_message(self, message):
         self.__message = message

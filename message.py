@@ -6,6 +6,7 @@ class Message:
     __id = b''
     __name = ''
     __phone = ''
+    __bot_name = ''
     __body = ''
     __message = ''
     __imap = None
@@ -15,6 +16,7 @@ class Message:
         self.__id = mess_id
         self.__name = ''
         self.__phone = ''
+        self.__bot_name = ''
         self.__body = ''
         self.__message = ''
         self.__imap = imap
@@ -49,10 +51,21 @@ class Message:
         else:
             self.__body = self.__message.get_payload().decode('utf-8')
         self.__log.add(Levels.info, 'Текст письма получен:\n{0}'.format(str.replace(self.__body, '\r\n', ' ')))
+        self.__body = self.__body.split('\r\n')
+
+    def set_bot_name(self):
+        self.__log.add(Levels.info, 'Получаем имя бота...')
+        str_array = self.__body
+        for el in str_array:
+            if el.startswith('['):
+                self.__bot_name = el[1:str.find(el, ']')]
+                self.__log.add(Levels.info, f'Получено имя бота: {self.__bot_name}')
+                return
+        self.__log.add(Levels.warn, 'Имя бота не получено, проверьте письмо')
 
     def set_name_and_phone(self):
         self.__log.add(Levels.info, 'Вычленяем имя и телефон...')
-        str_array = self.__body.split('\r\n')
+        str_array = self.__body
         for el in str_array:
             if el.startswith('Имя'):
                 arr = el.split(': ')
@@ -67,3 +80,6 @@ class Message:
 
     def get_phone(self):
         return self.__phone
+
+    def get_bot_name(self):
+        return self.__bot_name
