@@ -1,5 +1,5 @@
 venv
 .idea
 __pycache__
-.\log.txt
-.\auth.py
+log.txt
+auth.py
